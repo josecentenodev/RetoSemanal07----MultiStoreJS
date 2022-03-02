@@ -1,0 +1,12 @@
+{
+  "name": "retosemanal07----multistorejs",
+  "version": "1.0.0",
+  "description": "MultiSotore en Vainilla JS y TailwindCSS",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "keywords": [],
+  "author": "Jose Cito",
+  "license": "ISC"
+}
