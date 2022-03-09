@@ -10,10 +10,10 @@
 // Buscar una manera de controlar la paginación mediante una función. Ya que hay que hacer más de un fetch.
 
 const apiCategorias = [
-  "electronics",
-  "jewelery",
-  "men's%20clothing",
-  "women's%20clothing",
+    "electronics",
+    "jewelery",
+    "men's%20clothing",
+    "women's%20clothing",
 ]
 
 let pagina = "home"
@@ -26,73 +26,75 @@ const articulosCategoria = document.querySelector("#articulosCategoria")
 const carrito = document.querySelector("#carrito")
 const loading = document.querySelector("#loading")
 const articuloDestacadoHero = document.querySelector(
-  ".articuloDestacado__hero"
+    ".articuloDestacado__hero"
 )
 
 // Inicia la App
 
-document.addEventListener("DOMContentLoaded", function () {
-  iniciarApp()
+document.addEventListener("DOMContentLoaded", function() {
+    iniciarApp()
 })
 
 function iniciarApp() {
-  mostrarHomePage()
+    mostrarHomePage()
 
-  botonesNavBar()
+    botonesNavBar()
 }
 
 // mostrarHomePage hace cambio de pagina manejando la class 'off', con setTimeOut
 // hace el fetch y trae los datos con la funcion mostrarCategorias
 
 function mostrarHomePage() {
-  loading.classList.remove("off")
-  categorias.innerHTML = ""
-  setTimeout(() => {
-    fetch("https://fakestoreapi.com/products/14")
-      .then((res) => res.json())
-      .then((item) => {
-        articuloDestacadoHero.style.backgroundImage = `url('${item.image}')`
-        mostrarCategorias(apiCategorias)
-        loading.classList.add("off")
-        articuloDestacado.classList.remove("off")
-        categorias.classList.remove("off")
-      })
-  }, 3000)
+    loading.classList.remove("off")
+    categorias.innerHTML = ""
+    setTimeout(() => {
+        fetch("https://fakestoreapi.com/products/14")
+            .then((res) => res.json())
+            .then((item) => {
+                articuloDestacadoHero.style.backgroundImage = `url('${item.image}')`
+                document.getElementById('aD').id = item.id
+                mostrarCategorias(apiCategorias)
+                loading.classList.add("off")
+                articuloDestacado.classList.remove("off")
+                categorias.classList.remove("off")
+            })
+        botonesCarrito()
+    }, 3000)
 }
 
 // mostrarCategorias con el array compuesto por categorias que tiene la api
 // ejecuta la funcion crearCategoria por cada item
 
 function mostrarCategorias(apiCats) {
-  apiCats.forEach((element) => {
-    crearCategoria(element)
-  })
+    apiCats.forEach((element) => {
+        crearCategoria(element)
+    })
 }
 
 // crearCategoria con el nombre de la categoria hace el fetch y lo agrega al innerHtml de
 // la section id="categorias"
 
 function crearCategoria(categoria) {
-  const url = `https://fakestoreapi.com/products/category/${categoria}?limit=1`
-  fetch(url)
-    .then((res) => res.json())
-    .then((res) =>
-      res.map((item) => {
-        const { image, category } = item
-        if (category.includes("women", 0)) {
-          const textID = category.slice(0, 5)
-          const modelo = `<article><div class="categoria"><img class="categoria__img" src=${image} alt="Categoria ${category}"/></div><button class="categoria__boton" id="${textID}\'s clothing" onClick={mostrarCategoria(this.id)}>${category}</button></article>`
-          categorias.innerHTML += modelo
-        } else if (category.includes("men")) {
-          const textID = category.slice(0, 3)
-          const modelo = `<article><div class="categoria"><img class="categoria__img" src=${image} alt="Categoria ${category}"/></div><button class="categoria__boton" id="${textID}\'s clothing" onClick={mostrarCategoria(this.id)}>${category}</button></article>`
-          categorias.innerHTML += modelo
-        } else {
-          const modelo = `<article><div class="categoria"><img class="categoria__img" src=${image} alt="Categoria ${category}"/></div><button class="categoria__boton" id=${category} onClick={mostrarCategoria(this.id)}>${category}</button></article>`
-          categorias.innerHTML += modelo
-        }
-      })
-    )
+    const url = `https://fakestoreapi.com/products/category/${categoria}?limit=1`
+    fetch(url)
+        .then((res) => res.json())
+        .then((res) =>
+            res.map((item) => {
+                const { image, category } = item
+                if (category.includes("women", 0)) {
+                    const textID = category.slice(0, 5)
+                    const modelo = `<article><div class="categoria"><img class="categoria__img" src=${image} alt="Categoria ${category}"/></div><button class="categoria__boton" id="${textID}\'s clothing" onClick={mostrarCategoria(this.id)}>${category}</button></article>`
+                    categorias.innerHTML += modelo
+                } else if (category.includes("men")) {
+                    const textID = category.slice(0, 3)
+                    const modelo = `<article><div class="categoria"><img class="categoria__img" src=${image} alt="Categoria ${category}"/></div><button class="categoria__boton" id="${textID}\'s clothing" onClick={mostrarCategoria(this.id)}>${category}</button></article>`
+                    categorias.innerHTML += modelo
+                } else {
+                    const modelo = `<article><div class="categoria"><img class="categoria__img" src=${image} alt="Categoria ${category}"/></div><button class="categoria__boton" id=${category} onClick={mostrarCategoria(this.id)}>${category}</button></article>`
+                    categorias.innerHTML += modelo
+                }
+            })
+        )
 }
 
 // mostrarCategoria primero vacía el innerHtml de articulosCategoria y luego hace el fetch
@@ -100,31 +102,32 @@ function crearCategoria(categoria) {
 // y devuelve el innerHtml de articulosCategoria con los productos con crearArticulosCategoria
 
 function mostrarCategoria(category) {
-  articulosCategoria.innerHTML = ""
-  const url = `https://fakestoreapi.com/products/category/${category}`
-  home.forEach((pagina) => {
-    pagina.classList.add("off")
-  })
-  loading.classList.remove("off")
-  setTimeout(() => {
-    fetch(url)
-      .then((res) => res.json())
-      .then((res) =>
-        res.map((item) => {
-          const { id, image, title, price, description } = item
-          crearArticulosCategoria(id, image, title, price, description)
-        })
-      )
-    loading.classList.add("off")
-    articulosCategoria.classList.remove("off")
-  }, 3000)
+    articulosCategoria.innerHTML = ""
+    const url = `https://fakestoreapi.com/products/category/${category}`
+    home.forEach((pagina) => {
+        pagina.classList.add("off")
+    })
+    loading.classList.remove("off")
+    setTimeout(() => {
+        fetch(url)
+            .then((res) => res.json())
+            .then((res) => {
+                res.map((item) => {
+                    const { id, image, title, price, description } = item
+                    crearArticulosCategoria(id, image, title, price, description)
+                })
+                botonesCarrito()
+            })
+        loading.classList.add("off")
+        articulosCategoria.classList.remove("off")
+    }, 3000)
 }
 
 // crearArticulosCategoria arma el innerHtml de articulosCategoria
 
 function crearArticulosCategoria(id, image, title, price, description) {
-  console.log(id, image, title, price, description)
-  const modelo = `<article>
+    console.log(id, image, title, price, description)
+    const modelo = `<article>
     <div class="articulo">
       <img
         class="articulo__img"
@@ -138,11 +141,52 @@ function crearArticulosCategoria(id, image, title, price, description) {
       Agregar <i class="fa-solid fa-cart-shopping white"></i>
     </button>
   </article>`
-  articulosCategoria.innerHTML += modelo
+    articulosCategoria.innerHTML += modelo
 }
 
 // Agrego los addEventListener en los botones del nav con una función 
 
 function botonesNavBar() {
+    const buttons = document.querySelectorAll('.navBar__boton')
+    buttons.forEach((boton) => {
+        boton.addEventListener('click', e => {
+            const categoria = e.target.innerHTML.toLowerCase()
+            mostrarCategoria(categoria)
+        })
+    })
+}
 
+// TODO: Falta hacer el Modal de los productos
+
+// CARRITO:
+// Primer objetivo es un array de objetos de compras
+// e ir modificando en funcion a los articulos que agrego y tambien tener
+// la posibilidad de eliminarlos
+// 1. Crear el array de articulos y mapearlo para agregar los items al innerHtml
+// 2. Totalizar los saldos del carrito
+
+const carritoCompras = {
+    articulosId: [],
+    precioTotal: ''
+}
+
+const carritoID = ''
+
+function botonesCarrito() {
+    const botones = document.querySelectorAll('.boton--comprar')
+    if (botones) {
+        botones.forEach(boton => boton.addEventListener('click', (e) => {
+            const id = e.target.id
+            if (id) {
+                agregarCarrito(id)
+                Swal.fire('Se agregó al Carrito!')
+            }
+        }))
+    }
+}
+
+function agregarCarrito(id) {
+    console.log(id)
+    carritoCompras.articulosId.push(id)
+    document.getElementById('carNumber').innerHTML = carritoCompras.articulosId.length
 }
