@@ -1,13 +1,11 @@
 //DONE: 1. Traer los datos de los productos de cada categoria pasando por parametro el valor de la categoria
 // Podría pasarlo con el valor de cada boton con un data-category.
 
-// 2. Buscar el producto con mayor rating o más votos para el producto destacado.
+//DONE: 2. Buscar el producto con mayor rating o más votos para el producto destacado.
 
-// 3. Agregar items a un array de objetos para luego armar el carrito.
+//DONE: 3. Agregar ids a un array de objetos para luego armar el carrito.
 
-// 4. Mostrar el carrito y el valor total a pagar
-
-// Buscar una manera de controlar la paginación mediante una función. Ya que hay que hacer más de un fetch.
+//TODO: 4. Mostrar el carrito y el valor total a pagar
 
 const apiCategorias = [
     "electronics",
@@ -24,6 +22,7 @@ const articuloDestacado = document.querySelector("#articuloDestacado")
 const categorias = document.querySelector("#categorias")
 const articulosCategoria = document.querySelector("#articulosCategoria")
 const carrito = document.querySelector("#carrito")
+const carritoLista = document.querySelector('#carritoLista')
 const loading = document.querySelector("#loading")
 const articuloDestacadoHero = document.querySelector(
     ".articuloDestacado__hero"
@@ -104,6 +103,9 @@ function crearCategoria(categoria) {
 function mostrarCategoria(category) {
     articulosCategoria.innerHTML = ""
     const url = `https://fakestoreapi.com/products/category/${category}`
+    if(!carrito.classList.contains('off')){
+        carrito.classList.add('off')
+    }
     home.forEach((pagina) => {
         pagina.classList.add("off")
     })
@@ -126,7 +128,6 @@ function mostrarCategoria(category) {
 // crearArticulosCategoria arma el innerHtml de articulosCategoria
 
 function crearArticulosCategoria(id, image, title, price, description) {
-    console.log(id, image, title, price, description)
     const modelo = `<article>
     <div class="articulo">
       <img
@@ -161,17 +162,15 @@ function botonesNavBar() {
 // CARRITO:
 // Primer objetivo es un array de objetos de compras
 // e ir modificando en funcion a los articulos que agrego y tambien tener
-// la posibilidad de eliminarlos
+// la posibilidad de eliminarlos (para esto genero un id unico con Date.now)
 // 1. Crear el array de articulos y mapearlo para agregar los items al innerHtml
 // 2. Totalizar los saldos del carrito
 
 const carritoCompras = {
     articulosId: [],
-    precioTotal: ''
+    precioTotal: 0
 }
-
-const carritoID = ''
-
+// Funcion para agregar el listener a los botones e ir agregando los id al array del carrito
 function botonesCarrito() {
     const botones = document.querySelectorAll('.boton--comprar')
     if (botones) {
@@ -184,9 +183,64 @@ function botonesCarrito() {
         }))
     }
 }
-
+// Funcion para crear id unico y pushear el array de carrito
 function agregarCarrito(id) {
-    console.log(id)
-    carritoCompras.articulosId.push(id)
+    const carritoID = `${id}-${Date.now()}`
+    carritoCompras.articulosId.push(carritoID)
     document.getElementById('carNumber').innerHTML = carritoCompras.articulosId.length
+}
+
+// Mostrar Carrito
+
+const botonCarrito = document.querySelector('#carBoton').addEventListener('click', ()=>{
+    mostrarCarrito(carritoCompras)
+})
+
+function mostrarCarrito(carritoCompras) {
+    const {articulosId} = carritoCompras
+    carritoLista.innerHTML = ''
+    home.forEach((pagina) => {
+        pagina.classList.add("off")
+    })
+    if(!categorias.classList.contains('off')){
+        categorias.classList.add('off')
+    }
+    loading.classList.remove("off")
+    setTimeout(()=>{
+        articulosId.map(idCarrito=>{
+            const idApi = idCarrito.split('-')
+            const id = idApi[0]
+            fetch(`https://fakestoreapi.com/products/${id}`)
+                .then(res => res.json())
+                .then((item) => {
+                    const {image, title, price, description} = item
+                    crearArticulosCarrito(idCarrito, image, title, price, description)
+                })
+        })
+    },3000)
+}
+
+function crearArticulosCarrito(idCarrito, image, title, price, description) {
+    //console.log(idCarrito, id, image, title, price, description)
+    carritoCompras.precioTotal += parseFloat(price)
+    const modelo = `<div class="carrito__lista--item">
+    <div class="articulo">
+      <img
+        class="articulo__img"
+        src=${image}
+        alt="Categoria electronics"
+      />
+    </div>
+    <div class="carrito__item--descripcion">
+      <h2 class="carrito__item--titulo">${title}</h2>
+      <p class="carrito__item--texto">${description}</p>
+      <p class="carrito__item--label">Precio:</p>
+      <p class="carrito__item--precio">$ ${price}</p>
+    </div>
+    <div class="carrito__botonera">
+      <i class="fa-solid fa-eye carrito__botonera--eye"></i>
+      <i class="fa-solid fa-trash carrito__botonera--trash data-id=${idCarrito}"></i>
+    </div>
+  </div>`
+  console.log('precio: ' + carritoCompras.precioTotal.toFixed(2))
 }
