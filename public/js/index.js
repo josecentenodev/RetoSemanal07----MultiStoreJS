@@ -58,7 +58,7 @@ function mostrarHomePage() {
                 categorias.classList.remove("off")
             })
         botonesCarrito()
-    }, 3000)
+    }, 1500)
 }
 
 // mostrarCategorias con el array compuesto por categorias que tiene la api
@@ -103,7 +103,7 @@ function crearCategoria(categoria) {
 function mostrarCategoria(category) {
     articulosCategoria.innerHTML = ""
     const url = `https://fakestoreapi.com/products/category/${category}`
-    if(!carrito.classList.contains('off')){
+    if (!carrito.classList.contains('off')) {
         carrito.classList.add('off')
     }
     home.forEach((pagina) => {
@@ -122,26 +122,24 @@ function mostrarCategoria(category) {
             })
         loading.classList.add("off")
         articulosCategoria.classList.remove("off")
-    }, 3000)
+    }, 1500)
 }
 
 // crearArticulosCategoria arma el innerHtml de articulosCategoria
 
 function crearArticulosCategoria(id, image, title, price, description) {
-    const modelo = `<article>
-    <div class="articulo">
+    const modelo = `<div class="articulo">
       <img
         class="articulo__img"
         src=${image}
         alt="Categoria electronics"
       />
-    </div>
-    <h3 class="articulo__titulo">${title}</h3>
-    <p class="articulo__precio">$${price}</p>
-    <button id=${id} class="boton--comprar">
+      <h3 class="articulo__titulo">${title}</h3>
+      <p class="articulo__precio">AR$ ${price}</p>
+      <button id=${id} class="boton--comprar">
       Agregar <i class="fa-solid fa-cart-shopping white"></i>
-    </button>
-  </article>`
+      </button>
+      </div>`
     articulosCategoria.innerHTML += modelo
 }
 
@@ -167,10 +165,10 @@ function botonesNavBar() {
 // 2. Totalizar los saldos del carrito
 
 const carritoCompras = {
-    articulosId: [],
-    precioTotal: 0
-}
-// Funcion para agregar el listener a los botones e ir agregando los id al array del carrito
+        articulosId: [],
+        precioTotal: 0
+    }
+    // Funcion para agregar el listener a los botones e ir agregando los id al array del carrito
 function botonesCarrito() {
     const botones = document.querySelectorAll('.boton--comprar')
     if (botones) {
@@ -178,7 +176,7 @@ function botonesCarrito() {
             const id = e.target.id
             if (id) {
                 agregarCarrito(id)
-                Swal.fire('Se agregó al Carrito!')
+                    // Swal.fire('Se agregó al Carrito!')
             }
         }))
     }
@@ -192,39 +190,40 @@ function agregarCarrito(id) {
 
 // Mostrar Carrito
 
-const botonCarrito = document.querySelector('#carBoton').addEventListener('click', ()=>{
+const botonCarrito = document.querySelector('#carBoton').addEventListener('click', () => {
     mostrarCarrito(carritoCompras)
 })
 
 function mostrarCarrito(carritoCompras) {
-    const {articulosId} = carritoCompras
+    const { articulosId } = carritoCompras
     carritoLista.innerHTML = ''
     home.forEach((pagina) => {
         pagina.classList.add("off")
     })
-    if(!categorias.classList.contains('off')){
-        categorias.classList.add('off')
-    }
+    articulosCategoria.classList.add("off")
     loading.classList.remove("off")
-    setTimeout(()=>{
-        articulosId.map(idCarrito=>{
+    setTimeout(() => {
+        articulosId.map(idCarrito => {
             const idApi = idCarrito.split('-')
             const id = idApi[0]
             fetch(`https://fakestoreapi.com/products/${id}`)
                 .then(res => res.json())
                 .then((item) => {
-                    const {image, title, price, description} = item
+                    const { image, title, price, description } = item
+                    carritoCompras.precioTotal += parseFloat(price)
                     crearArticulosCarrito(idCarrito, image, title, price, description)
                 })
         })
-    },3000)
+        carrito.classList.remove("off")
+        loading.classList.add("off")
+        carritoLista.innerHTML += `<button onClick={comprarCarrito()} class="carrito__boton--comprar">Comprar <i class="fa-solid fa-cart-shopping white"></i></button>`
+    }, 1500)
 }
 
 function crearArticulosCarrito(idCarrito, image, title, price, description) {
     //console.log(idCarrito, id, image, title, price, description)
-    carritoCompras.precioTotal += parseFloat(price)
     const modelo = `<div class="carrito__lista--item">
-    <div class="articulo">
+    <div class="carrito__articulo">
       <img
         class="articulo__img"
         src=${image}
@@ -235,12 +234,15 @@ function crearArticulosCarrito(idCarrito, image, title, price, description) {
       <h2 class="carrito__item--titulo">${title}</h2>
       <p class="carrito__item--texto">${description}</p>
       <p class="carrito__item--label">Precio:</p>
-      <p class="carrito__item--precio">$ ${price}</p>
+      <p class="carrito__item--precio">AR$ ${price}</p>
     </div>
     <div class="carrito__botonera">
-      <i class="fa-solid fa-eye carrito__botonera--eye"></i>
       <i class="fa-solid fa-trash carrito__botonera--trash data-id=${idCarrito}"></i>
     </div>
   </div>`
-  console.log('precio: ' + carritoCompras.precioTotal.toFixed(2))
+    carritoLista.innerHTML += modelo
+}
+
+function comprarCarrito() {
+    Swal.fire(`AR$ ${carritoCompras.precioTotal}`)
 }
